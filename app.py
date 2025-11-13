@@ -16,7 +16,7 @@ import pandas as pd
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret-key')
 CORS(app)
 
 @app.route("/")
@@ -140,25 +140,6 @@ def upload_file():
     except Exception as e:
         flash(f"Erro ao enviar arquivo: {str(e)}")
         return redirect(url_for('upload_file'))
-
-
-@app.route("/analyze", methods=["GET"])
-def analyze():
-    global last_uploaded_file
-    if not last_uploaded_file or not os.path.exists(last_uploaded_file):
-        return jsonify({"error": "Nenhum arquivo CSV disponível para análise"}), 400
-
-    df = load_csv(last_uploaded_file)
-    stats = get_basic_stats(df)
-    plots = generate_visualizations(df, os.path.join("static", "plots"))
-
-    return jsonify({
-        "status": "ok",
-        "arquivo_analisado": os.path.basename(last_uploaded_file),
-        "estatisticas": stats,
-        "graficos_gerados": list(plots.values())
-    })
-
 
 @app.route("/download/<path:filename>")
 def download_plot(filename):

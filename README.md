@@ -108,7 +108,6 @@ O servidor será iniciado em:
 
 - Para análise dos dados, acesse `/analysis`.
 - Serão exibidos:
-  - Estatísticas descritivas do dataset
   - Gráficos automáticos (histogramas e correlação)
   - Mapa interativo com localização das cidades (via Folium)
 

@@ -63,9 +63,7 @@ block content %}
     </div>
   </div>
 
-  <!-- Visualizations Section -->
   {% if plots %}
-  <!-- Debug Info (remover em produção) -->
   <div class="row mb-2">
     <div class="col-12">
       <div class="alert alert-info">
@@ -199,48 +197,6 @@ block content %}
   </div>
   {% endif %}
 
-  <!-- Statistics Summary -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="fas fa-calculator me-2"></i>
-            Estatísticas Descritivas
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            {% for column, column_stats in stats.items() %}
-            <div class="col-md-6 col-lg-4 mb-3">
-              <div class="card border-start border-primary border-3">
-                <div class="card-body">
-                  <h6 class="card-title text-primary">{{ column }}</h6>
-                  <div class="small">
-                    {% if column_stats is mapping %} {% for stat_name,
-                    stat_value in column_stats.items() %}
-                    <div class="d-flex justify-content-between">
-                      <span><strong>{{ stat_name }}:</strong></span>
-                      <span>
-                        {% if stat_value is number %} {{
-                        "%.2f"|format(stat_value) }} {% else %} {{ stat_value }}
-                        {% endif %}
-                      </span>
-                    </div>
-                    {% endfor %} {% else %}
-                    <div><strong>Valor:</strong> {{ column_stats }}</div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Action Buttons -->
   <div class="row mb-4">
     <div class="col-12 text-center">
@@ -285,6 +241,4 @@ block content %}
   </div>
   {% endif %}
 </div>
-{% endblock %} {% block scripts %}
-<!-- Sem JavaScript necessário - tudo renderizado pelo servidor -->
-{% endblock %}
+{% endblock %} {% block scripts %} {% endblock %}
