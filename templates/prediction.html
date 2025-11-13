@@ -237,13 +237,11 @@ endblock %} {% block content %}
 </div>
 {% endblock %} {% block scripts %}
 <script>
-  // Variáveis globais
   let currentModelId = null;
   let currentModelType = null;
   let modelFeatures = null;
   let availableColumns = [];
 
-  // URLs das APIs backend
   const API_BASE_URL = window.location.origin;
 
   // Carrega colunas do dataset

@@ -56,7 +56,6 @@ A aplicação foi dividida em **frontend e backend**, de forma modular e escalá
 
 - **HTML5 + CSS3**
 - **Bootstrap 5**
-- **Chart.js**
 - **FontAwesome**
 - **Templates Jinja2**
 
