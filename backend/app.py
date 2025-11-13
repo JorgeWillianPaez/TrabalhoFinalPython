@@ -33,7 +33,7 @@ def index():
         }
     })
 
-# Guarda o último arquivo carregado em memória simples (poderia ser DB futuramente)
+# Guarda o último arquivo carregado em memória simples 
 last_uploaded_file = None
 
 @app.route("/upload", methods=["POST"])

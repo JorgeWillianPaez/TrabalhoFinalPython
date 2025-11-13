@@ -18,24 +18,9 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BACKEND_DIR / "models"
 MODEL_DIR.mkdir(exist_ok=True)
 
-
+# Treina um modelo de machine learning usando o ml_module.py
 def train_model(csv_path, model_type="regression", target_col=None, 
                 algorithm="rf", params=None, test_size=0.2, random_state=42):
-    """
-    Treina um modelo de machine learning usando o ml_module.
-    
-    Args:
-        csv_path: caminho para o arquivo CSV
-        model_type: 'regression', 'classification' ou 'both'
-        target_col: nome da coluna alvo
-        algorithm: tipo de algoritmo ('rf', 'linreg', 'logreg', 'knn')
-        params: dicionário com hiperparâmetros
-        test_size: proporção do dataset para teste
-        random_state: seed para reprodutibilidade
-    
-    Returns:
-        Dicionário com informações do modelo treinado
-    """
     if not os.path.exists(csv_path):
         raise FileNotFoundError("Arquivo CSV não encontrado para treinamento.")
 
@@ -158,27 +143,11 @@ def train_model(csv_path, model_type="regression", target_col=None,
         raise RuntimeError(f"Erro ao treinar modelo: {str(e)}") from e
 
 
+# Treina modelos de regressão e classificação simultaneamente
 def train_both_models(csv_path, target_reg, target_clf, 
                      reg_algorithm="rf", clf_algorithm="rf",
                      reg_params=None, clf_params=None,
-                     test_size=0.2, random_state=42):
-    """
-    Treina modelos de regressão e classificação simultaneamente.
-    
-    Args:
-        csv_path: caminho para o arquivo CSV
-        target_reg: coluna alvo para regressão
-        target_clf: coluna alvo para classificação
-        reg_algorithm: algoritmo de regressão
-        clf_algorithm: algoritmo de classificação
-        reg_params: parâmetros para regressão
-        clf_params: parâmetros para classificação
-        test_size: proporção do dataset para teste
-        random_state: seed para reprodutibilidade
-    
-    Returns:
-        Dicionário com resultados de ambos os modelos
-    """
+                     test_size=0.2, random_state=42): 
     if not os.path.exists(csv_path):
         raise FileNotFoundError("Arquivo CSV não encontrado para treinamento.")
 
@@ -272,17 +241,8 @@ def train_both_models(csv_path, target_reg, target_clf,
     except Exception as e:
         raise RuntimeError(f"Erro ao treinar modelos: {str(e)}") from e
 
-
+# Carrega um modelo treinado e seus metadados
 def load_model(model_id):
-    """
-    Carrega um modelo treinado e seus metadados.
-    
-    Args:
-        model_id: ID do modelo
-    
-    Returns:
-        Tupla (modelo, metadados, label_encoder se classificação)
-    """
     metadata_path = MODEL_DIR / f"{model_id}_metadata.json"
     
     if not metadata_path.exists():
@@ -311,18 +271,8 @@ def load_model(model_id):
     return model, metadata, label_encoder
 
 
+#Faz predições usando um modelo treinado
 def predict_with_model(model_id, data, model_type=None):
-    """
-    Faz predições usando um modelo treinado.
-    
-    Args:
-        model_id: ID do modelo
-        data: DataFrame ou dicionário com dados para predição
-        model_type: 'regression' ou 'classification' (opcional, tenta detectar)
-    
-    Returns:
-        Dicionário com predições
-    """
     import pandas as pd
     
     model, metadata, label_encoder = load_model(model_id)
@@ -369,14 +319,8 @@ def predict_with_model(model_id, data, model_type=None):
     except Exception as e:
         raise RuntimeError(f"Erro ao fazer predições: {str(e)}") from e
 
-
+# Lista todos os modelos treinados
 def list_models():
-    """
-    Lista todos os modelos treinados.
-    
-    Returns:
-        Lista de metadados dos modelos
-    """
     models = []
     
     for metadata_file in MODEL_DIR.glob("*_metadata.json"):

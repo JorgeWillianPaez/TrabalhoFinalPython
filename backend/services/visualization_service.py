@@ -10,7 +10,7 @@ def generate_visualizations(df, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     plots = {}
 
-    # 1. Distribuição de valores (numéricos)
+    # Distribuição de valores (numéricos)
     for col in df.select_dtypes(include="number").columns:
         plt.figure(figsize=(6,4))
         sns.histplot(df[col].dropna(), kde=True)
@@ -21,7 +21,7 @@ def generate_visualizations(df, output_dir):
         plt.close()
         plots[col] = plot_path
 
-    # 2. Correlação
+    # Correlação
     corr_path = os.path.join(output_dir, "correlation.png")
     plt.figure(figsize=(10, 8))
     sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
@@ -46,16 +46,12 @@ def generate_visualizations(df, output_dir):
     return plots
 
 
+# mapa interativo com base na coluna de cidades
 def generate_city_map(df, city_col):
-    """
-    Gera um mapa interativo com base na coluna de cidades.
-    As cidades são geocodificadas e exibidas com contagem agregada.
-    """
     geolocator = Nominatim(user_agent="data_analysis_app")
-    mapa = folium.Map(location=[-15.78, -47.93], zoom_start=4, tiles="cartodbpositron")  # centro do Brasil
+    mapa = folium.Map(location=[-15.78, -47.93], zoom_start=4, tiles="cartodbpositron")  
     cluster = MarkerCluster().add_to(mapa)
 
-    # Agrupar por cidade (contagem de registros)
     city_counts = df[city_col].value_counts().to_dict()
 
     for city, count in city_counts.items():
@@ -67,7 +63,7 @@ def generate_city_map(df, city_col):
                     popup=f"{city}: {count} registros",
                     tooltip=city
                 ).add_to(cluster)
-                time.sleep(1)  # evita bloqueio do serviço de geocodificação
+                time.sleep(1)  
         except Exception as e:
             print(f"Erro ao localizar {city}: {e}")
 
