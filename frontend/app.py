@@ -1,7 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import os
+from dotenv import load_dotenv
+
+# Carrega variáveis de ambiente do arquivo .env
+load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')  # Necessário para usar flash()
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -58,4 +63,4 @@ def results():
     return render_template('results.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001, host='0.0.0.0')

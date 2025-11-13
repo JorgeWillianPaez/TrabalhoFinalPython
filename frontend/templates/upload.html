@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% block title %}Upload de Arquivo - Análise de
+E-commerce{% endblock %} {% block content %}
+<div class="col-12">
+  <div class="container mt-4">
+    <!-- Header -->
+    <div class="row">
+      <div class="col-12">
+        <h2 class="mb-4">
+          <i class="fas fa-upload me-2 text-primary"></i>
+          Upload de Dados
+        </h2>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-8 mx-auto">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-file-csv me-2"></i>
+              Selecionar Arquivo
+            </h5>
+          </div>
+          <div class="card-body">
+            <form id="uploadForm" enctype="multipart/form-data">
+              <div class="mb-4">
+                <label for="file" class="form-label"
+                  >Escolha seu arquivo CSV:</label
+                >
+                <input
+                  type="file"
+                  class="form-control form-control-lg"
+                  id="file"
+                  name="file"
+                  accept=".csv"
+                  required
+                />
+                <div class="form-text">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Apenas arquivos .csv são aceitos. Tamanho máximo: 50MB
+                </div>
+              </div>
+
+              <div id="uploadStatus" class="alert" style="display: none;"></div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn">
+                  <i class="fas fa-upload me-2"></i>
+                  Fazer Upload e Analisar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('file');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    if (!fileInput.files || !fileInput.files[0]) {
+      showStatus('Por favor, selecione um arquivo', 'danger');
+      return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    // Validação de tipo
+    if (!file.name.endsWith('.csv')) {
+      showStatus('Por favor, selecione um arquivo CSV', 'danger');
+      return;
+    }
+    
+    // Desabilita botão durante upload
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+    statusDiv.style.display = 'none';
+    
+    try {
+      // Faz upload via API do backend
+      const response = await API.uploadFile(file);
+      
+      showStatus('Arquivo enviado com sucesso! Redirecionando...', 'success');
+      
+      // Redireciona após 1 segundo
+      setTimeout(() => {
+        window.location.href = "{{ url_for('dashboard') }}";
+      }, 1000);
+      
+    } catch (error) {
+      showStatus('Erro ao fazer upload: ' + error.message, 'danger');
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Fazer Upload e Analisar';
+    }
+  });
+  
+  function showStatus(message, type) {
+    const statusDiv = document.getElementById('uploadStatus');
+    statusDiv.className = `alert alert-${type}`;
+    statusDiv.textContent = message;
+    statusDiv.style.display = 'block';
+  }
+</script>
+{% endblock %}

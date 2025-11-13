@@ -1,0 +1,11 @@
+Flask
+flask-cors
+pandas
+matplotlib
+seaborn
+numpy
+folium
+geopy
+scikit-learn
+joblib
+python-dotenv
