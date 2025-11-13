@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}Predições ML - E-commerce Analytics{% endblock %}
+
+{% block content %}
+<div class="col-12">
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-1">
+                    <i class="fas fa-brain me-2 text-warning"></i>
+                    Predições E-commerce com Machine Learning
+                </h2>
+                <p class="text-muted">Configure algoritmos para predizer comportamento de clientes e satisfação</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            Configuração do Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="problemType" class="form-label">Tipo de Problema</label>
+                                    <select class="form-select" id="problemType" onchange="updateAlgorithms()">
+                                        <option value="classification">Classificação</option>
+                                        <option value="regression">Regressão</option>
+                                        <option value="clustering">Segmentação</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="algorithm" class="form-label">Algoritmo</label>
+                                    <select class="form-select" id="algorithm">
+                                        <option value="random_forest">Random Forest</option>
+                                        <option value="logistic_regression">Regressão Logística</option>
+                                        <option value="svm">SVM</option>
+                                        <option value="naive_bayes">Naive Bayes</option>
+                                        <option value="decision_tree">Árvore de Decisão</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="targetVariable" class="form-label">Variável Alvo</label>
+                                    <select class="form-select" id="targetVariable">
+                                        <option value="customer_rating">Rating do Cliente</option>
+                                        <option value="is_returning_customer">Cliente Recorrente</option>
+                                        <option value="product_category">Categoria Preferida</option>
+                                        <option value="total_amount">Valor do Pedido</option>
+                                        <option value="payment_method">Método de Pagamento</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Variáveis Preditoras</label>
+                                    <div class="border p-3 rounded">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="age" id="age" checked>
+                                            <label class="form-check-label" for="age">Idade</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="gender" id="gender" checked>
+                                            <label class="form-check-label" for="gender">Gênero</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="session_duration" id="session_duration">
+                                            <label class="form-check-label" for="session_duration">Duração da Sessão</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="pages_viewed" id="pages_viewed">
+                                            <label class="form-check-label" for="pages_viewed">Páginas Visitadas</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="device_type" id="device_type">
+                                            <label class="form-check-label" for="device_type">Tipo de Dispositivo</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="delivery_time" id="delivery_time">
+                                            <label class="form-check-label" for="delivery_time">Tempo de Entrega</label>
+                                        </div>
+                                    </div>
+                                </div>
+                      />
+                      <label class="form-check-label" for="idade">Idade</label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="experiencia"
+                        id="experiencia"
+                        checked
+                      />
+                      <label class="form-check-label" for="experiencia"
+                        >Experiência</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="educacao"
+                        id="educacao"
+                      />
+                      <label class="form-check-label" for="educacao"
+                        >Educação</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="vendas_anteriores"
+                        id="vendas_anteriores"
+                      />
+                      <label class="form-check-label" for="vendas_anteriores"
+                        >Vendas Anteriores</label
+                      >
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value="regiao"
+                        id="regiao"
+                      />
+                      <label class="form-check-label" for="regiao"
+                        >Região</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Parâmetros do Modelo</label>
+                  <div class="border p-3 rounded">
+                    <div class="mb-2">
+                      <label for="testSize" class="form-label"
+                        >Tamanho do Conjunto de Teste (%)</label
+                      >
+                      <input
+                        type="range"
+                        class="form-range"
+                        id="testSize"
+                        min="10"
+                        max="50"
+                        value="20"
+                        onchange="updateTestSize(this.value)"
+                      />
+                      <small class="text-muted"
+                        >Valor: <span id="testSizeValue">20%</span></small
+                      >
+                    </div>
+                    <div class="mb-2">
+                      <label for="crossValidation" class="form-label"
+                        >K-Fold Cross Validation</label
+                      >
+                      <select
+                        class="form-select form-select-sm"
+                        id="crossValidation"
+                      >
+                        <option value="3">3-fold</option>
+                        <option value="5" selected>5-fold</option>
+                        <option value="10">10-fold</option>
+                      </select>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="scaleFeatures"
+                        checked
+                      />
+                      <label class="form-check-label" for="scaleFeatures">
+                        Normalizar variáveis
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-lg"
+                    onclick="trainModel()"
+                  >
+                    <i class="fas fa-play me-2"></i>
+                    Treinar Modelo
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-info ms-2"
+                    onclick="validateModel()"
+                  >
+                    <i class="fas fa-check-circle me-2"></i>
+                    Validar Modelo
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary ms-2"
+                    onclick="saveModel()"
+                  >
+                    <i class="fas fa-save me-2"></i>
+                    Salvar Configuração
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-line me-2"></i>
+              Performance do Modelo
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="performanceChart"></canvas>
+            <div class="mt-3">
+              <div class="row text-center">
+                <div class="col-4">
+                  <h4 class="text-primary">87.5%</h4>
+                  <small class="text-muted">Acurácia</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-success">84.2%</h4>
+                  <small class="text-muted">Precisão</small>
+                </div>
+                <div class="col-4">
+                  <h4 class="text-info">89.1%</h4>
+                  <small class="text-muted">Recall</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Importance -->
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-weight-hanging me-2"></i>
+              Importância das Variáveis
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="featureImportanceChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-magic me-2"></i>
+              Fazer Predição Individual
+            </h5>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label for="pred_idade" class="form-label">Idade</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="pred_idade"
+                    value="30"
+                  />
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="pred_experiencia" class="form-label"
+                    >Experiência (anos)</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="pred_experiencia"
+                    value="5"
+                  />
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="pred_educacao" class="form-label">Educação</label>
+                  <select class="form-select" id="pred_educacao">
+                    <option value="medio">Ensino Médio</option>
+                    <option value="superior">Superior</option>
+                    <option value="pos">Pós-graduação</option>
+                  </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label for="pred_regiao" class="form-label">Região</label>
+                  <select class="form-select" id="pred_regiao">
+                    <option value="sudeste">Sudeste</option>
+                    <option value="sul">Sul</option>
+                    <option value="nordeste">Nordeste</option>
+                    <option value="norte">Norte</option>
+                    <option value="centro_oeste">Centro-Oeste</option>
+                  </select>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="makePrediction()"
+              >
+                <i class="fas fa-crystal-ball me-2"></i>
+                Fazer Predição
+              </button>
+            </form>
+
+            <div id="predictionResult" class="mt-4" style="display: none">
+              <div class="alert alert-success">
+                <h5>
+                  <i class="fas fa-check-circle me-2"></i>Resultado da Predição
+                </h5>
+                <p class="mb-2">
+                  <strong>Salário Previsto:</strong>
+                  <span class="h4 text-success">R$ 5.247,83</span>
+                </p>
+                <p class="mb-0"><strong>Confiança:</strong> 92.3%</p>
+                <small class="text-muted"
+                  >Baseado no modelo Random Forest treinado</small
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-balance-scale me-2"></i>
+              Comparação de Modelos
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Modelo</th>
+                    <th>Acurácia</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="table-success">
+                    <td><strong>Random Forest</strong></td>
+                    <td>87.5%</td>
+                    <td><i class="fas fa-crown text-warning"></i></td>
+                  </tr>
+                  <tr>
+                    <td>Reg. Logística</td>
+                    <td>84.1%</td>
+                    <td><i class="fas fa-check text-success"></i></td>
+                  </tr>
+                  <tr>
+                    <td>SVM</td>
+                    <td>82.7%</td>
+                    <td><i class="fas fa-check text-success"></i></td>
+                  </tr>
+                  <tr>
+                    <td>Decision Tree</td>
+                    <td>79.3%</td>
+                    <td><i class="fas fa-check text-success"></i></td>
+                  </tr>
+                  <tr class="table-warning">
+                    <td>Naive Bayes</td>
+                    <td>-</td>
+                    <td><i class="fas fa-clock text-warning"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-3">
+              <button
+                class="btn btn-outline-primary btn-sm w-100"
+                onclick="compareModels()"
+              >
+                <i class="fas fa-chart-bar me-1"></i>
+                Ver Comparação Detalhada
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  const perfCtx = document.getElementById("performanceChart").getContext("2d");
+  new Chart(perfCtx, {
+    type: "radar",
+    data: {
+      labels: ["Acurácia", "Precisão", "Recall", "F1-Score", "AUC"],
+      datasets: [
+        {
+          label: "Random Forest",
+          data: [87.5, 84.2, 89.1, 86.5, 92.3],
+          borderColor: "rgb(54, 162, 235)",
+          backgroundColor: "rgba(54, 162, 235, 0.2)",
+        },
+        {
+          label: "Reg. Logística",
+          data: [84.1, 81.5, 86.2, 83.8, 88.9],
+          borderColor: "rgb(255, 99, 132)",
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          beginAtZero: true,
+          max: 100,
+        },
+      },
+    },
+  });
+
+  // Feature Importance Chart
+  const featCtx = document
+    .getElementById("featureImportanceChart")
+    .getContext("2d");
+  new Chart(featCtx, {
+    type: "horizontalBar",
+    data: {
+      labels: ["Experiência", "Idade", "Educação", "Região", "Vendas Ant."],
+      datasets: [
+        {
+          label: "Importância (%)",
+          data: [45, 25, 15, 10, 5],
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.8)",
+            "rgba(54, 162, 235, 0.8)",
+            "rgba(255, 205, 86, 0.8)",
+            "rgba(75, 192, 192, 0.8)",
+            "rgba(153, 102, 255, 0.8)",
+          ],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      indexAxis: "y",
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+    },
+  });
+
+  // Interactive functions
+  function updateAlgorithms() {
+    const problemType = document.getElementById("problemType").value;
+    const algorithmSelect = document.getElementById("algorithm");
+
+    algorithmSelect.innerHTML = "";
+
+    if (problemType === "classification") {
+      algorithmSelect.innerHTML = `
+                <option value="random_forest">Random Forest</option>
+                <option value="logistic_regression">Regressão Logística</option>
+                <option value="svm">SVM</option>
+                <option value="naive_bayes">Naive Bayes</option>
+                <option value="decision_tree">Árvore de Decisão</option>
+            `;
+    } else if (problemType === "regression") {
+      algorithmSelect.innerHTML = `
+                <option value="linear_regression">Regressão Linear</option>
+                <option value="random_forest_reg">Random Forest Regressor</option>
+                <option value="svr">SVR</option>
+                <option value="decision_tree_reg">Árvore de Decisão</option>
+            `;
+    } else if (problemType === "clustering") {
+      algorithmSelect.innerHTML = `
+                <option value="kmeans">K-Means</option>
+                <option value="hierarchical">Clustering Hierárquico</option>
+                <option value="dbscan">DBSCAN</option>
+            `;
+    }
+  }
+
+  function updateTestSize(value) {
+    document.getElementById("testSizeValue").textContent = value + "%";
+  }
+
+  function trainModel() {
+    alert("Iniciando treinamento do modelo...");
+  }
+
+  function validateModel() {
+    alert("Executando validação cruzada...");
+  }
+
+  function saveModel() {
+    alert("Salvando configuração do modelo...");
+  }
+
+  function makePrediction() {
+    document.getElementById("predictionResult").style.display = "block";
+  }
+
+  function compareModels() {
+    alert("Abrindo comparação detalhada dos modelos...");
+  }
+</script>
+{% endblock %}

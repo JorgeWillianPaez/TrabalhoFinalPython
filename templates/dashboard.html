@@ -1,0 +1,451 @@
+{% extends "base.html" %} {% block title %}Dashboard - E-commerce Analytics{%
+endblock %} {% block content %}
+<div class="col-12">
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="mb-1">
+          <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+          Dashboard E-commerce Analytics
+        </h2>
+        <p class="text-muted">
+          Análise do comportamento de clientes e performance de vendas
+        </p>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="mb-0">5,002</h4>
+                <p class="mb-0">Total de Pedidos</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-shopping-cart fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="mb-0">3,847</h4>
+                <p class="mb-0">Clientes Únicos</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-users fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="mb-0">R$ 1.2M</h4>
+                <p class="mb-0">Receita Total</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-dollar-sign fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="mb-0">4.1</h4>
+                <p class="mb-0">Rating Médio</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-star fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+      <!-- Data Overview -->
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-chart-line me-2"></i>
+              Vendas por Categoria
+            </h5>
+          </div>
+          <div class="card-body">
+            <canvas id="salesByCategoryChart" height="100"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-history me-2"></i>
+              Análises Recentes
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Dataset</th>
+                    <th>Algoritmo</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <span class="badge bg-primary">Predição de Rating</span>
+                    </td>
+                    <td>ecommerce_behavior.csv</td>
+                    <td>Random Forest</td>
+                    <td>2024-11-12 14:30</td>
+                    <td><span class="badge bg-success">Concluída</span></td>
+                    <td>
+                      <a
+                        href="{{ url_for('results') }}"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        <i class="fas fa-eye me-1"></i>Ver
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-warning">Segmentação</span></td>
+                    <td>customer_behavior.csv</td>
+                    <td>K-Means</td>
+                    <td>2024-11-12 13:15</td>
+                    <td><span class="badge bg-success">Concluída</span></td>
+                    <td>
+                      <a
+                        href="{{ url_for('results') }}"
+                        class="btn btn-sm btn-outline-primary"
+                      >
+                        <i class="fas fa-eye me-1"></i>Ver
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-info">Valor CLV</span></td>
+                    <td>customer_lifetime.csv</td>
+                    <td>Linear Regression</td>
+                    <td>2024-11-12 12:45</td>
+                    <td>
+                      <span class="badge bg-warning">Em Processamento</span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-secondary" disabled>
+                        <i class="fas fa-clock me-1"></i>Aguardando
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-rocket me-2"></i>
+              Ações Rápidas
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i>Novo Dataset
+              </a>
+              <a
+                href="{{ url_for('analysis') }}"
+                class="btn btn-outline-success"
+              >
+                <i class="fas fa-chart-bar me-2"></i>Análise Visual
+              </a>
+              <a
+                href="{{ url_for('prediction') }}"
+                class="btn btn-outline-warning"
+              >
+                <i class="fas fa-brain me-2"></i>Predição ML
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-info-circle me-2"></i>
+              Resumo dos Dados
+            </h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <strong>Dataset atual:</strong><br />
+                <small class="text-muted"
+                  >ecommerce_customer_behavior_dataset.csv</small
+                >
+              </li>
+              <li class="mb-2">
+                <strong>Período:</strong><br />
+                <small class="text-muted">Jan/2023 - Mar/2024</small>
+              </li>
+              <li class="mb-2">
+                <strong>Dimensões:</strong><br />
+                <small class="text-muted">18 colunas × 5,002 linhas</small>
+              </li>
+              <li class="mb-0">
+                <strong>Categorias:</strong><br />
+                <small class="text-muted"
+                  >Electronics, Fashion, Food, Sports, etc.</small
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="fas fa-trophy me-2"></i>
+              Top Categorias
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-2">
+              <div class="d-flex justify-content-between">
+                <span>Electronics</span>
+                <strong>28.3%</strong>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-primary" style="width: 28.3%"></div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <div class="d-flex justify-content-between">
+                <span>Fashion</span>
+                <strong>22.1%</strong>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-success" style="width: 22.1%"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span>Food</span>
+                <strong>18.7%</strong>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-info" style="width: 18.7%"></div>
+              </div>
+            </div>
+            <a
+              href="{{ url_for('analysis') }}"
+              class="btn btn-sm btn-outline-primary w-100"
+            >
+              <i class="fas fa-chart-pie me-1"></i>Ver Análise Detalhada
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0">Dispositivos de Acesso</h6>
+          </div>
+          <div class="card-body">
+            <canvas id="deviceUsageChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0">Métodos de Pagamento</h6>
+          </div>
+          <div class="card-body">
+            <canvas id="paymentMethodsChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0">Distribuição de Idade</h6>
+          </div>
+          <div class="card-body">
+            <canvas id="ageDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  const salesCtx = document
+    .getElementById("salesByCategoryChart")
+    .getContext("2d");
+  new Chart(salesCtx, {
+    type: "bar",
+    data: {
+      labels: [
+        "Electronics",
+        "Fashion",
+        "Food",
+        "Sports",
+        "Beauty",
+        "Books",
+        "Home & Garden",
+      ],
+      datasets: [
+        {
+          label: "Receita (R$)",
+          data: [340000, 265000, 225000, 191000, 145000, 98000, 87000],
+          backgroundColor: [
+            "#007bff",
+            "#28a745",
+            "#ffc107",
+            "#fd7e14",
+            "#e83e8c",
+            "#6f42c1",
+            "#20c997",
+          ],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return "R$ " + value / 1000 + "k";
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const deviceCtx = document
+    .getElementById("deviceUsageChart")
+    .getContext("2d");
+  new Chart(deviceCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["Mobile", "Desktop", "Tablet"],
+      datasets: [
+        {
+          data: [65, 28, 7],
+          backgroundColor: ["#007bff", "#28a745", "#ffc107"],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "bottom",
+        },
+      },
+    },
+  });
+
+  const paymentCtx = document
+    .getElementById("paymentMethodsChart")
+    .getContext("2d");
+  new Chart(paymentCtx, {
+    type: "pie",
+    data: {
+      labels: [
+        "Credit Card",
+        "Digital Wallet",
+        "Debit Card",
+        "Cash on Delivery",
+      ],
+      datasets: [
+        {
+          data: [45, 25, 20, 10],
+          backgroundColor: ["#dc3545", "#ffc107", "#28a745", "#6c757d"],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "bottom",
+        },
+      },
+    },
+  });
+
+  const ageCtx = document
+    .getElementById("ageDistributionChart")
+    .getContext("2d");
+  new Chart(ageCtx, {
+    type: "line",
+    data: {
+      labels: ["18-25", "26-35", "36-45", "46-55", "56+"],
+      datasets: [
+        {
+          label: "Clientes",
+          data: [850, 1420, 1680, 920, 132],
+          borderColor: "#007bff",
+          backgroundColor: "rgba(0, 123, 255, 0.1)",
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+</script>
+{% endblock %}
