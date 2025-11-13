@@ -1,0 +1,319 @@
+{% extends "base.html" %} {% block title %}Resultados - Sistema Analytics{%
+endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4">
+        <i class="fas fa-chart-pie me-3"></i>
+        Resultados do Sistema
+      </h1>
+      <p class="text-muted">
+        Resumo das análises realizadas e status do sistema
+      </p>
+    </div>
+  </div>
+
+  <!-- System Status Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-0">{{ system_info.plots_generated or 0 }}</h3>
+              <p class="mb-0">Gráficos Gerados</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-chart-bar fa-2x"></i>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small>Pasta /static/plots</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-0">
+                {% if system_info.has_data %}SIM{% else %}NÃO{% endif %}
+              </h3>
+              <p class="mb-0">Dados Carregados</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-database fa-2x"></i>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small
+              >{% if system_info.last_file %}{{ system_info.last_file }}{% else
+              %}Nenhum arquivo{% endif %}</small
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-0">
+                {% if analysis_data %}{{ analysis_data.stats_count }}{% else
+                %}0{% endif %}
+              </h3>
+              <p class="mb-0">Estatísticas</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-calculator fa-2x"></i>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small>Variáveis analisadas</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-0">Python</h3>
+              <p class="mb-0">Backend</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-code fa-2x"></i>
+            </div>
+          </div>
+          <div class="mt-2">
+            <small>Server-side rendering</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Information Section -->
+  {% if analysis_data %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Informações do Dataset
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Arquivo:</strong> {{ analysis_data.filename }}</p>
+              <p>
+                <strong>Dimensões:</strong> {{ analysis_data.shape[0] }} linhas
+                × {{ analysis_data.shape[1] }} colunas
+              </p>
+              <p>
+                <strong>Colunas numéricas:</strong> {{
+                analysis_data.numeric_columns|length }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h6>Colunas do dataset:</h6>
+              <div class="mb-2">
+                {% for col in analysis_data.columns[:10] %}
+                <span class="badge bg-secondary me-1 mb-1">{{ col }}</span>
+                {% endfor %} {% if analysis_data.columns|length > 10 %}
+                <span class="text-muted"
+                  >... e {{ analysis_data.columns|length - 10 }} mais</span
+                >
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Analysis Actions -->
+  <div class="row mb-4">
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-line me-2"></i>
+            Visualizações Disponíveis
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if system_info.plots_generated > 0 %}
+          <p class="text-success mb-3">
+            <i class="fas fa-check-circle me-1"></i>
+            {{ system_info.plots_generated }} gráficos foram gerados
+          </p>
+          <a href="{{ url_for('analysis_page') }}" class="btn btn-primary">
+            <i class="fas fa-eye me-2"></i>
+            Visualizar Análises
+          </a>
+          {% else %}
+          <p class="text-warning mb-3">
+            <i class="fas fa-exclamation-triangle me-1"></i>
+            Nenhum gráfico encontrado
+          </p>
+          <a
+            href="{{ url_for('upload_page') }}"
+            class="btn btn-outline-primary"
+          >
+            <i class="fas fa-upload me-2"></i>
+            Enviar Dados
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>
+            Próximos Passos
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if system_info.has_data %}
+          <p class="text-success mb-3">
+            <i class="fas fa-check-circle me-1"></i>
+            Dados carregados com sucesso
+          </p>
+          <a href="{{ url_for('prediction_page') }}" class="btn btn-success">
+            <i class="fas fa-brain me-2"></i>
+            Fazer Predições
+          </a>
+          {% else %}
+          <p class="text-info mb-3">
+            <i class="fas fa-info-circle me-1"></i>
+            Carregue dados para começar
+          </p>
+          <a
+            href="{{ url_for('upload_page') }}"
+            class="btn btn-outline-success"
+          >
+            <i class="fas fa-plus me-2"></i>
+            Começar Análise
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Information -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-server me-2"></i>
+            Arquitetura do Sistema
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="mb-3">
+                <i class="fas fa-python fa-3x text-primary mb-2"></i>
+                <h6>Python Backend</h6>
+                <small class="text-muted">Flask + Matplotlib</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <i class="fas fa-html5 fa-3x text-warning mb-2"></i>
+                <h6>Server-side Rendering</h6>
+                <small class="text-muted">Jinja2 Templates</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <i class="fas fa-chart-area fa-3x text-success mb-2"></i>
+                <h6>Visualizations</h6>
+                <small class="text-muted">Seaborn + Folium</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="mb-3">
+                <i class="fas fa-database fa-3x text-info mb-2"></i>
+                <h6>Data Processing</h6>
+                <small class="text-muted">Pandas + NumPy</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-rocket me-2"></i>
+            Ações Rápidas
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('dashboard') }}"
+                class="btn btn-outline-primary btn-block"
+              >
+                <i class="fas fa-home me-1"></i>
+                Dashboard
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('upload_page') }}"
+                class="btn btn-outline-success btn-block"
+              >
+                <i class="fas fa-upload me-1"></i>
+                Upload Dados
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('analysis_page') }}"
+                class="btn btn-outline-info btn-block"
+              >
+                <i class="fas fa-chart-line me-1"></i>
+                Ver Análises
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a
+                href="{{ url_for('prediction_page') }}"
+                class="btn btn-outline-warning btn-block"
+              >
+                <i class="fas fa-brain me-1"></i>
+                Predições
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -63,7 +63,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('upload_page') }}">
+              <a class="nav-link" href="{{ url_for('upload_file') }}">
                 <i class="fas fa-upload me-1"></i>Upload
               </a>
             </li>
@@ -73,12 +73,12 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('analysis') }}">
+              <a class="nav-link" href="{{ url_for('analysis_page') }}">
                 <i class="fas fa-chart-bar me-1"></i>Análises
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('prediction') }}">
+              <a class="nav-link" href="{{ url_for('prediction_page') }}">
                 <i class="fas fa-brain me-1"></i>Predições
               </a>
             </li>
@@ -108,7 +108,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='api.js') }}"></script>
     {% block scripts %} {% endblock %}
   </body>
 </html>

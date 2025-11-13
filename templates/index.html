@@ -12,7 +12,7 @@ endblock %} {% block content %}
         Analise comportamento de clientes, prediga satisfação e otimize vendas
         com IA
       </p>
-      <a class="btn btn-light btn-lg mt-3" href="{{ url_for('upload_page') }}">
+      <a class="btn btn-light btn-lg mt-3" href="{{ url_for('upload_file') }}">
         <i class="fas fa-upload me-2"></i>Começar Análise
       </a>
     </div>
@@ -29,7 +29,7 @@ endblock %} {% block content %}
               Carregue dados de vendas, clientes e comportamento de compras em
               CSV
             </p>
-            <a href="{{ url_for('upload_page') }}" class="btn btn-primary">
+            <a href="{{ url_for('upload_file') }}" class="btn btn-primary">
               <i class="fas fa-upload me-1"></i>Upload
             </a>
           </div>
@@ -45,7 +45,7 @@ endblock %} {% block content %}
               Explore padrões de compra com gráficos de categoria, dispositivos
               e comportamento
             </p>
-            <a href="{{ url_for('analysis') }}" class="btn btn-success">
+            <a href="{{ url_for('analysis_page') }}" class="btn btn-success">
               <i class="fas fa-chart-bar me-1"></i>Analisar
             </a>
           </div>
@@ -61,7 +61,7 @@ endblock %} {% block content %}
               Prediga rating de clientes, valor de pedidos e segmentação
               automática
             </p>
-            <a href="{{ url_for('prediction') }}" class="btn btn-warning">
+            <a href="{{ url_for('prediction_page') }}" class="btn btn-warning">
               <i class="fas fa-brain me-1"></i>Predizer
             </a>
           </div>
