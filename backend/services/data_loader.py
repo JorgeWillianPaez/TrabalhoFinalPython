@@ -1,25 +1,14 @@
 import pandas as pd
 import numpy as np
 import re
-from pathlib import Path
 
-
-def limpar_dataset(caminho):
-    """
-    Limpa e prepara o dataset para uso em machine learning.
+def clean_dataset(filepath):
+    print(f"Lendo arquivo: {filepath}\n")
     
-    Args:
-        caminho: caminho para o arquivo CSV
-        
-    Returns:
-        DataFrame limpo e processado
-    """
-    print(f"📂 Lendo arquivo: {caminho}\n")
+    df = pd.read_csv(filepath, encoding="utf-8")
+    print("Arquivo lido com sucesso!\n")
     
-    df = pd.read_csv(caminho, encoding="utf-8")
-    print("✅ Arquivo lido com sucesso!\n")
-    
-    # === Corrige cabeçalhos ===
+    # corrige cabeçalhos 
     df.columns = (
         df.columns
         .str.strip()
@@ -29,19 +18,18 @@ def limpar_dataset(caminho):
         .str.lower()
     )
     
-    # === Conversão automática para datas ===
+    # conversão automática para datas 
     for col in df.columns:
         if "date" in col.lower() or "time" in col.lower():
             try:
                 df[col] = pd.to_datetime(df[col], errors='coerce')
-            except:
+            except Exception:
                 pass
     
-    # === Nulos ===
-    print("💧 Valores nulos por coluna:")
+    print("Valores nulos por coluna:")
     print(df.isnull().sum(), "\n")
     
-    # === Preenchimento ===
+    # preenchimento 
     for col in df.columns:
         if pd.api.types.is_numeric_dtype(df[col]):
             df[col].fillna(df[col].median(), inplace=True)
@@ -50,24 +38,24 @@ def limpar_dataset(caminho):
         else:
             df[col].fillna("desconhecido", inplace=True)
     
-    # === Remove duplicatas ===
+    # remover duplicatas
     duplicadas = df.duplicated().sum()
     df.drop_duplicates(inplace=True)
-    print(f"🧬 Duplicatas removidas: {duplicadas}")
+    print(f"Duplicatas removidas: {duplicadas}")
     
-    # === Limpa strings ===
+    # limpar strings
     for col in df.select_dtypes(include='object'):
         df[col] = df[col].str.strip()
     
-    # === Converte números ===
+    # converte números em strings para numéricos
     for col in df.columns:
         if df[col].dtype == object:
             try:
                 df[col] = pd.to_numeric(df[col].str.replace(",", "."), errors='ignore')
-            except:
+            except Exception:
                 pass
     
-    # === Correção específica ===
+    # correção específica para 'delivery_time_days'
     if 'delivery_time_days' in df.columns:
         col = 'delivery_time_days'
         
@@ -80,13 +68,12 @@ def limpar_dataset(caminho):
         df[col].fillna(df[col].median(), inplace=True)
         df[col] = df[col].astype(int)
         
-        print(f"\n✅ Coluna '{col}' corrigida!")
+        print(f"\nColuna '{col}' corrigida")
         print(df[col].head(10))
     else:
-        print("⚠ Coluna 'delivery_time_days' não encontrada.\n")
+        print("Coluna 'delivery_time_days' não encontrada.\n")
     
-    # === Info final ===
-    print("\n📊 Informações finais:")
+    print("\nInformações finais:")
     print(df.info())
     print("\nPrimeiras linhas:")
     print(df.head(), "\n")
@@ -94,21 +81,10 @@ def limpar_dataset(caminho):
     return df
 
 
+# carrega e limpa o arquivo CSV
 def load_csv(filepath):
-    """
-    Carrega e limpa um arquivo CSV usando a função limpar_dataset().
-    
-    Args:
-        filepath: caminho para o arquivo CSV
-        
-    Returns:
-        DataFrame limpo e processado
-        
-    Raises:
-        ValueError: Se o arquivo estiver vazio ou houver erro no processamento
-    """
     try:
-        df = limpar_dataset(filepath)  # Integração principal
+        df = clean_dataset(filepath)  
         
         if df.empty:
             raise ValueError("O arquivo CSV está vazio após limpeza.")
