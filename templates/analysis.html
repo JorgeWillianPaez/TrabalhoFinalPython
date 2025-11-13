@@ -92,7 +92,7 @@ block content %}
           </h6>
           <div class="row mb-4">
             {% for plot_key, plot_url in plots.items() %} {% if plot_key !=
-            'correlation' and plot_key != 'mapa_cidades' and
+            'correlation' and plot_key != 'mapa_vendas' and
             plot_url.endswith('.png') %}
             <div class="col-md-6 col-lg-4 mb-3">
               <div class="card">
@@ -159,7 +159,7 @@ block content %}
           {% endif %}
 
           <!-- Mapa Interativo (se disponível) -->
-          {% if plots.mapa_cidades %}
+          {% if plots.mapa_vendas %}
           <h6 class="mb-3 text-warning">
             <i class="fas fa-map-marked-alt me-2"></i>
             Mapa Interativo das Cidades
@@ -172,7 +172,7 @@ block content %}
                 </div>
                 <div class="card-body">
                   <iframe
-                    src="{{ plots.mapa_cidades }}"
+                    src="{{ plots.mapa_vendas }}"
                     width="100%"
                     height="400"
                     frameborder="0"
@@ -180,7 +180,7 @@ block content %}
                   </iframe>
                   <div class="mt-2">
                     <a
-                      href="{{ plots.mapa_cidades }}"
+                      href="{{ plots.mapa_vendas }}"
                       target="_blank"
                       class="btn btn-sm btn-outline-warning"
                     >
