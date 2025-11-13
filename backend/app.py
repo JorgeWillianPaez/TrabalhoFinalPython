@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash
 from flask_cors import CORS
 from config import Config
 from utils.file_utils import save_file
@@ -16,10 +16,90 @@ import pandas as pd
 
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app)  # Permite requisições do frontend
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+CORS(app)
 
 @app.route("/")
 def index():
+    return render_template('index.html')
+
+@app.route("/index")
+def index_page():
+    return render_template('index.html')
+
+@app.route("/upload-page")
+def upload_page():
+    return render_template('upload.html')
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route("/analysis-page")
+def analysis_page():
+    global last_uploaded_file
+    
+    if not last_uploaded_file or not os.path.exists(last_uploaded_file):
+        flash("Nenhum arquivo CSV disponível para análise. Faça o upload primeiro.")
+        return redirect(url_for('upload_file'))
+    
+    try:
+        df = load_csv(last_uploaded_file)
+        stats = get_basic_stats(df)
+        plots = generate_visualizations(df, os.path.join("static", "plots"))
+        
+        plot_urls = {}
+        for key, path in plots.items():
+            clean_path = path.replace('static/', '').replace('static\\', '').replace('\\', '/')
+            plot_urls[key] = f"/static/{clean_path}"
+            print(f"DEBUG - Plot {key}: {path} -> {plot_urls[key]}")
+        
+        print(f"DEBUG - Final plot_urls: {plot_urls}")
+        
+        return render_template('analysis.html', 
+                             stats=stats, 
+                             plots=plot_urls,
+                             filename=os.path.basename(last_uploaded_file),
+                             shape=df.shape)
+    except Exception as e:
+        flash(f"Erro ao analisar dados: {str(e)}")
+        return redirect(url_for('upload_file'))
+
+@app.route("/prediction-page")
+def prediction_page():
+    return render_template('prediction.html')
+
+@app.route("/results-page")
+def results_page():
+    global last_uploaded_file
+    
+    system_info = {
+        'last_file': os.path.basename(last_uploaded_file) if last_uploaded_file else None,
+        'plots_generated': len([f for f in os.listdir('static/plots') if f.endswith('.png') or f.endswith('.html')]) if os.path.exists('static/plots') else 0,
+        'has_data': last_uploaded_file and os.path.exists(last_uploaded_file)
+    }
+    
+    analysis_data = None
+    if system_info['has_data']:
+        try:
+            df = load_csv(last_uploaded_file)
+            stats = get_basic_stats(df)
+            analysis_data = {
+                'filename': os.path.basename(last_uploaded_file),
+                'shape': df.shape,
+                'columns': df.columns.tolist(),
+                'numeric_columns': df.select_dtypes(include='number').columns.tolist(),
+                'stats_count': len(stats) if stats else 0
+            }
+        except Exception as e:
+            analysis_data = None
+    
+    return render_template('results.html', 
+                         system_info=system_info, 
+                         analysis_data=analysis_data)
+
+@app.route("/api")
+def api_info():
     return jsonify({
         "message": "API de Análise de Dados com Flask e Machine Learning",
         "endpoints": {
@@ -33,23 +113,33 @@ def index():
         }
     })
 
-# Guarda o último arquivo carregado em memória simples 
 last_uploaded_file = None
 
-@app.route("/upload", methods=["POST"])
+@app.route("/upload", methods=["GET", "POST"])
 def upload_file():
     global last_uploaded_file
+    
+    if request.method == "GET":
+        return render_template('upload.html')
+    
     if "file" not in request.files:
-        return jsonify({"error": "Nenhum arquivo enviado"}), 400
+        flash("Nenhum arquivo enviado")
+        return redirect(url_for('upload_file'))
 
     file = request.files["file"]
+    
+    if file.filename == '':
+        flash("Nenhum arquivo selecionado")
+        return redirect(url_for('upload_file'))
 
     try:
         filepath = save_file(file, app.config["UPLOAD_FOLDER"])
         last_uploaded_file = filepath
-        return jsonify({"message": "Arquivo enviado com sucesso", "path": filepath})
+        flash("Arquivo enviado com sucesso! Pronto para análise.")
+        return redirect(url_for('dashboard'))
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        flash(f"Erro ao enviar arquivo: {str(e)}")
+        return redirect(url_for('upload_file'))
 
 
 @app.route("/analyze", methods=["GET"])
@@ -80,7 +170,6 @@ def download_plot(filename):
 
 @app.route("/columns", methods=["GET"])
 def get_columns():
-    """Retorna as colunas do último arquivo enviado."""
     global last_uploaded_file
     if not last_uploaded_file or not os.path.exists(last_uploaded_file):
         return jsonify({"error": "Nenhum arquivo CSV disponível"}), 400
@@ -102,7 +191,6 @@ def get_columns():
 
 @app.route("/train", methods=["POST"])
 def train():
-    """Treina um modelo de regressão ou classificação."""
     global last_uploaded_file
     if not last_uploaded_file or not os.path.exists(last_uploaded_file):
         return jsonify({"error": "Nenhum arquivo CSV disponível para treinamento"}), 400
@@ -110,7 +198,7 @@ def train():
     try:
         data = request.get_json() or {}
         
-        model_type = data.get("model_type", "regression")  # 'regression' ou 'classification'
+        model_type = data.get("model_type", "regression")
         target_col = data.get("target_col")
         algorithm = data.get("algorithm", "rf")
         params = data.get("params")
@@ -120,7 +208,6 @@ def train():
         if not target_col:
             return jsonify({"error": "target_col é obrigatório"}), 400
         
-        # Mapeia nomes de algoritmos do frontend para o backend
         algorithm_map = {
             "random_forest": "rf",
             "random_forest_reg": "rf",
@@ -150,7 +237,6 @@ def train():
 
 @app.route("/train/both", methods=["POST"])
 def train_both():
-    """Treina modelos de regressão e classificação simultaneamente."""
     global last_uploaded_file
     if not last_uploaded_file or not os.path.exists(last_uploaded_file):
         return jsonify({"error": "Nenhum arquivo CSV disponível para treinamento"}), 400
@@ -192,7 +278,6 @@ def train_both():
 
 @app.route("/models", methods=["GET"])
 def get_models():
-    """Lista todos os modelos treinados."""
     try:
         models = list_models()
         return jsonify({
@@ -205,10 +290,8 @@ def get_models():
 
 @app.route("/models/<model_id>", methods=["GET"])
 def get_model(model_id):
-    """Obtém informações de um modelo específico."""
     try:
         model, metadata, label_encoder = load_model(model_id)
-        # Remove o modelo do retorno (muito grande para JSON)
         metadata.pop("model_path", None)
         if "regression" in metadata:
             metadata["regression"].pop("model_path", None)
@@ -227,7 +310,6 @@ def get_model(model_id):
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    """Faz predições usando um modelo treinado."""
     try:
         data = request.get_json()
         
@@ -235,8 +317,8 @@ def predict():
             return jsonify({"error": "Dados não fornecidos"}), 400
         
         model_id = data.get("model_id")
-        model_type = data.get("model_type")  # 'regression' ou 'classification'
-        features = data.get("features")  # Dicionário com valores das features
+        model_type = data.get("model_type")
+        features = data.get("features")
         
         if not model_id:
             return jsonify({"error": "model_id é obrigatório"}), 400
@@ -260,14 +342,11 @@ def predict():
 
 @app.route("/models/<model_id>/features", methods=["GET"])
 def get_model_features(model_id):
-    """Obtém a lista de features necessárias para um modelo."""
     try:
         model, metadata, label_encoder = load_model(model_id)
         
-        # Determina o tipo do modelo
         model_type = metadata.get("model_type")
         
-        # Se o modelo tem ambos os tipos, precisa especificar
         if model_type is None:
             model_type_param = request.args.get("model_type")
             if not model_type_param:
@@ -276,18 +355,14 @@ def get_model_features(model_id):
                 }), 400
             model_type = model_type_param
         
-        # Obtém features do metadata
-        # Se o modelo tem ambos os tipos (regression e classification), busca dentro da chave correspondente
         if "regression" in metadata and "classification" in metadata:
-            # Modelo com ambos os tipos
             if model_type == "regression":
                 numeric_features = metadata.get("regression", {}).get("numeric_features", [])
                 categorical_features = metadata.get("regression", {}).get("categorical_features", [])
-            else:  # classification
+            else:
                 numeric_features = metadata.get("classification", {}).get("numeric_features", [])
                 categorical_features = metadata.get("classification", {}).get("categorical_features", [])
         else:
-            # Modelo único (regression ou classification)
             numeric_features = metadata.get("numeric_features", [])
             categorical_features = metadata.get("categorical_features", [])
         
